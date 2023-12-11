@@ -19,7 +19,7 @@ then
 else
 	echo "#LVM use : no"
 fi
-echo "#TCP Connexions:" $(ss -s | head -n 2 | tail -n 1 | cut -b 1-8)
+echo "#TCP Connexions:" $(ss -s | head -n 2 | tail -n 1 | cut -b 16-17)
 echo "#Users logged:" $(w -h | wc -l)
 ipaddr=$(ifconfig -a | grep "inet" | head -n 1 | cut -b 14-22)
 macaddr=$(ifconfig -a | grep "ether" | cut -b 15-31)
