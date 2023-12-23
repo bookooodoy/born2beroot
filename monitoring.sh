@@ -1,17 +1,20 @@
 #!/bin/bash
+#!/bin/bash
 
-echo "#Architecture : Linux" $(uname -rm)
+echo "#Architecture : " $(uname -sra)
 echo "#CPU Physical :" $(cat /proc/cpuinfo | grep "cpu cores" | tail -c 2)
 echo "#vCPU :" $(cat /proc/cpuinfo | grep processor | wc -l)
-memused=$(cat /proc/meminfo | grep "Mem" | tail -n 1 | cut -b 19-24)
-memtotal=$(cat /proc/meminfo | grep "Mem" | head -n 1 | cut -b 19-24)
+meminfo=$(free --mega | awk 'NR==2 {print $2,$3}')
+memused=$(echo $meminfo | awk '{print $2}')
+memtotal=$(echo $meminfo | awk '{printf $1}')
 echo "#Memory Usage : $memused kb/$memtotal kb" $(printf "(%.2f\n%%)" $(echo "($memused / $memtotal) * 100" | bc -l))
-dfavailable=$(df -a --total | tail -n 1 | cut -b 43-49)
-dfsize=$(df -a --total | tail -n 1 | cut -b 53-59)
-dfused=$(df -a --total | tail -n 1 | cut -b 62-64)
-echo "#Disk Usage : $dfavailable kb/$dfsize kb ($dfused)"
+dfinfo=$(df -a --total -h | tail -n 1)
+dfavailable=$(echo $dfinfo | awk '{print $4}')
+dfused=$(echo $dfinfo | awk '{print $3}')
+dfpercentage=$(echo $dfinfo | awk '{print $5}')
+echo "#Disk Usage : $dfused /$dfavailable ($dfpercentage)"
 echo "#CPU Load :" $(uptime | cut -b 45-48)
-echo "#Last Boot:" $(last reboot --time-format iso | tail -n 1 | cut -b 13-37)
+echo "#Last Boot:" $(last reboot | head -n 1 | awk '{print $5,$6,$7,$8}')
 lvmuse=$(lsblk | grep -c "lvm")
 if  [ $lvmuse -gt 0 ];
 then
